@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useSearchParams } from 'react-router';
-import Layout from '../components/Layout';
-import styles from './RegistRecipe.module.css';
+import React, { useState } from "react";
+import { useSearchParams } from "react-router";
+import Layout from "../../components/Layout";
+import styles from "./RegistRecipe.module.css";
 
 /* ==========================================================================
    Step 1 컴포넌트: 기본 정보 입력
    ========================================================================== */
 function Step1BasicInfo({ formData, updateFormData }) {
-  const [newTag, setNewTag] = useState('');
+  const [newTag, setNewTag] = useState("");
   const [isAddingTag, setIsAddingTag] = useState(false);
 
   const handleAddTag = () => {
@@ -15,18 +15,18 @@ function Step1BasicInfo({ formData, updateFormData }) {
       setIsAddingTag(false);
       return;
     }
-    const formattedTag = newTag.trim().startsWith('#') ? newTag.trim() : `#${newTag.trim()}`;
+    const formattedTag = newTag.trim().startsWith("#") ? newTag.trim() : `#${newTag.trim()}`;
     if (!formData.tags.includes(formattedTag)) {
-      updateFormData('tags', [...formData.tags, formattedTag]);
+      updateFormData("tags", [...formData.tags, formattedTag]);
     }
-    setNewTag('');
+    setNewTag("");
     setIsAddingTag(false);
   };
 
-  const handleRemoveTag = (tagToRemove) => {
+  const handleRemoveTag = tagToRemove => {
     updateFormData(
-      'tags',
-      formData.tags.filter((tag) => tag !== tagToRemove),
+      "tags",
+      formData.tags.filter(tag => tag !== tagToRemove),
     );
   };
 
@@ -34,10 +34,10 @@ function Step1BasicInfo({ formData, updateFormData }) {
     <div className={styles.stepContent}>
       {/* 폼 제목 */}
       <div className={styles.stepTitle}>
-        <h3 className="text-xl" style={{ fontWeight: 600, color: 'var(--brand-brown)' }}>
+        <h3 className="text-xl" style={{ fontWeight: 600, color: "var(--brand-brown)" }}>
           📝 1단계: 기본 정보 입력
         </h3>
-        <p className="text-m" style={{ color: 'var(--brand-gray)', marginTop: '8px' }}>
+        <p className="text-m" style={{ color: "var(--brand-gray)", marginTop: "8px" }}>
           레시피에 대한 기본 정보를 입력하세요.
         </p>
       </div>
@@ -51,7 +51,7 @@ function Step1BasicInfo({ formData, updateFormData }) {
           type="text"
           className={styles.textInput}
           value={formData.title}
-          onChange={(e) => updateFormData('title', e.target.value)}
+          onChange={e => updateFormData("title", e.target.value)}
           placeholder="레시피 제목을 입력하세요."
         />
       </div>
@@ -62,7 +62,7 @@ function Step1BasicInfo({ formData, updateFormData }) {
         <textarea
           className={styles.textareaInput}
           value={formData.description}
-          onChange={(e) => updateFormData('description', e.target.value)}
+          onChange={e => updateFormData("description", e.target.value)}
           placeholder="레시피에 대한 한 줄 설명이나 소개글을 입력해주세요."
           rows={3}
         />
@@ -75,7 +75,7 @@ function Step1BasicInfo({ formData, updateFormData }) {
           <select
             className={styles.selectBox}
             value={formData.category}
-            onChange={(e) => updateFormData('category', e.target.value)}
+            onChange={e => updateFormData("category", e.target.value)}
           >
             <option>한식</option>
             <option>양식</option>
@@ -92,7 +92,7 @@ function Step1BasicInfo({ formData, updateFormData }) {
             type="number"
             className={styles.textInput}
             value={formData.cookingTime}
-            onChange={(e) => updateFormData('cookingTime', e.target.value)}
+            onChange={e => updateFormData("cookingTime", e.target.value)}
             placeholder="20"
           />
         </div>
@@ -102,7 +102,7 @@ function Step1BasicInfo({ formData, updateFormData }) {
           <select
             className={styles.selectBox}
             value={formData.difficulty}
-            onChange={(e) => updateFormData('difficulty', e.target.value)}
+            onChange={e => updateFormData("difficulty", e.target.value)}
           >
             <option>초간단</option>
             <option>하</option>
@@ -117,20 +117,24 @@ function Step1BasicInfo({ formData, updateFormData }) {
             type="number"
             className={styles.textInput}
             value={formData.servings}
-            onChange={(e) => updateFormData('servings', e.target.value)}
+            onChange={e => updateFormData("servings", e.target.value)}
             placeholder="2"
           />
         </div>
       </div>
 
       {/* 태그 입력 영역 */}
-      <div className={styles.inputGroup} style={{ marginTop: '12px' }}>
+      <div className={styles.inputGroup} style={{ marginTop: "12px" }}>
         <label className={styles.inputLabel}>태그</label>
         <div className={styles.tagList}>
-          {formData.tags.map((tag) => (
+          {formData.tags.map(tag => (
             <span key={tag} className={styles.tagChip}>
               {tag}
-              <button type="button" className={styles.tagDeleteBtn} onClick={() => handleRemoveTag(tag)}>
+              <button
+                type="button"
+                className={styles.tagDeleteBtn}
+                onClick={() => handleRemoveTag(tag)}
+              >
                 ✕
               </button>
             </span>
@@ -142,8 +146,8 @@ function Step1BasicInfo({ formData, updateFormData }) {
                 type="text"
                 className={styles.addTagInput}
                 value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
+                onChange={e => setNewTag(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && (e.preventDefault(), handleAddTag())}
                 placeholder="태그 입력"
                 autoFocus
               />
@@ -167,7 +171,20 @@ function Step1BasicInfo({ formData, updateFormData }) {
    ========================================================================== */
 function Step2Ingredients({ formData, updateFormData }) {
   // 계량 단위 옵션 목록
-  const unitOptions = ["g", "ml", "kg", "L", "T (큰술)", "t (작은술)", "컵", "개", "줄", "포기", "조각", "적당량"];
+  const unitOptions = [
+    "g",
+    "ml",
+    "kg",
+    "L",
+    "T (큰술)",
+    "t (작은술)",
+    "컵",
+    "개",
+    "줄",
+    "포기",
+    "조각",
+    "적당량",
+  ];
 
   // 초기 재료 데이터: 기본 재료, 양념장 재료 2개 그룹 세팅
   const [ingredientGroups, setIngredientGroups] = useState(
@@ -207,11 +224,11 @@ function Step2Ingredients({ formData, updateFormData }) {
               },
             ],
           },
-        ]
+        ],
   );
 
   // 상위 formData 동기화
-  const syncWithFormData = (newGroups) => {
+  const syncWithFormData = newGroups => {
     setIngredientGroups(newGroups);
     updateFormData("ingredientGroups", newGroups);
   };
@@ -235,27 +252,25 @@ function Step2Ingredients({ formData, updateFormData }) {
   };
 
   // 그룹 삭제 (최소 1개 그룹 유지 제어)
-  const handleRemoveGroup = (groupId) => {
+  const handleRemoveGroup = groupId => {
     if (ingredientGroups.length <= 1) {
       alert("최소 하나의 재료 그룹은 화면에 남아있어야 합니다.");
       return;
     }
-    syncWithFormData(ingredientGroups.filter((g) => g.id !== groupId));
+    syncWithFormData(ingredientGroups.filter(g => g.id !== groupId));
   };
 
   // 그룹 제목 변경
   const handleGroupTitleChange = (groupId, newTitle) => {
     syncWithFormData(
-      ingredientGroups.map((group) =>
-        group.id === groupId ? { ...group, title: newTitle } : group
-      )
+      ingredientGroups.map(group => (group.id === groupId ? { ...group, title: newTitle } : group)),
     );
   };
 
   // 재료 행 추가
-  const handleAddItem = (groupId) => {
+  const handleAddItem = groupId => {
     syncWithFormData(
-      ingredientGroups.map((group) => {
+      ingredientGroups.map(group => {
         if (group.id === groupId) {
           return {
             ...group,
@@ -272,39 +287,39 @@ function Step2Ingredients({ formData, updateFormData }) {
           };
         }
         return group;
-      })
+      }),
     );
   };
 
   // 재료 행 삭제
   const handleRemoveItem = (groupId, itemId) => {
     syncWithFormData(
-      ingredientGroups.map((group) => {
+      ingredientGroups.map(group => {
         if (group.id === groupId) {
           return {
             ...group,
-            items: group.items.filter((item) => item.id !== itemId),
+            items: group.items.filter(item => item.id !== itemId),
           };
         }
         return group;
-      })
+      }),
     );
   };
 
   // 재료 항목 필드 변경 (name, amount, unit, isSubstitutable)
   const handleItemChange = (groupId, itemId, field, value) => {
     syncWithFormData(
-      ingredientGroups.map((group) => {
+      ingredientGroups.map(group => {
         if (group.id === groupId) {
           return {
             ...group,
-            items: group.items.map((item) =>
-              item.id === itemId ? { ...item, [field]: value } : item
+            items: group.items.map(item =>
+              item.id === itemId ? { ...item, [field]: value } : item,
             ),
           };
         }
         return group;
-      })
+      }),
     );
   };
 
@@ -323,7 +338,7 @@ function Step2Ingredients({ formData, updateFormData }) {
       <div className={styles.titleDivider} />
 
       {/* 재료 그룹 목록 */}
-      {ingredientGroups.map((group) => (
+      {ingredientGroups.map(group => (
         <div key={group.id} className={styles.groupCard}>
           {/* 그룹 헤더 */}
           <div className={styles.groupHeaderRow}>
@@ -332,7 +347,7 @@ function Step2Ingredients({ formData, updateFormData }) {
                 type="text"
                 className={styles.groupTitleInput}
                 value={group.title}
-                onChange={(e) => handleGroupTitleChange(group.id, e.target.value)}
+                onChange={e => handleGroupTitleChange(group.id, e.target.value)}
                 placeholder="그룹명 입력"
               />
               <button
@@ -357,7 +372,7 @@ function Step2Ingredients({ formData, updateFormData }) {
 
           {/* 재료 행 목록 */}
           <div className={styles.ingredientRowsContainer}>
-            {group.items.map((item) => (
+            {group.items.map(item => (
               <div key={item.id} className={styles.ingredientRow}>
                 {/* 1. 재료명 */}
                 <div style={{ flex: 1.5, position: "relative" }}>
@@ -365,7 +380,7 @@ function Step2Ingredients({ formData, updateFormData }) {
                     type="text"
                     className={styles.textInputWithIcon}
                     value={item.name}
-                    onChange={(e) => handleItemChange(group.id, item.id, "name", e.target.value)}
+                    onChange={e => handleItemChange(group.id, item.id, "name", e.target.value)}
                     placeholder="예: 닭가슴살"
                   />
                   <span className={styles.pencilIcon}>✏️</span>
@@ -377,7 +392,7 @@ function Step2Ingredients({ formData, updateFormData }) {
                     type="number"
                     className={styles.textInput}
                     value={item.amount}
-                    onChange={(e) => handleItemChange(group.id, item.id, "amount", e.target.value)}
+                    onChange={e => handleItemChange(group.id, item.id, "amount", e.target.value)}
                     placeholder="300"
                   />
                 </div>
@@ -387,9 +402,9 @@ function Step2Ingredients({ formData, updateFormData }) {
                   <select
                     className={styles.selectBox}
                     value={item.unit}
-                    onChange={(e) => handleItemChange(group.id, item.id, "unit", e.target.value)}
+                    onChange={e => handleItemChange(group.id, item.id, "unit", e.target.value)}
                   >
-                    {unitOptions.map((unit) => (
+                    {unitOptions.map(unit => (
                       <option key={unit} value={unit}>
                         {unit}
                       </option>
@@ -403,7 +418,7 @@ function Step2Ingredients({ formData, updateFormData }) {
                     <input
                       type="checkbox"
                       checked={item.isSubstitutable}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleItemChange(group.id, item.id, "isSubstitutable", e.target.checked)
                       }
                     />
@@ -452,10 +467,10 @@ function Step2Ingredients({ formData, updateFormData }) {
 function Step3Steps() {
   return (
     <div className={styles.stepTitle}>
-      <h3 className="text-xl" style={{ fontWeight: 600, color: 'var(--brand-brown)' }}>
+      <h3 className="text-xl" style={{ fontWeight: 600, color: "var(--brand-brown)" }}>
         🍳 3단계: 조리 과정 등록
       </h3>
-      <p className="text-m" style={{ color: 'var(--brand-gray)', marginTop: '8px' }}>
+      <p className="text-m" style={{ color: "var(--brand-gray)", marginTop: "8px" }}>
         순서별 조리 설명과 팁을 작성하세요.
       </p>
     </div>
@@ -465,10 +480,10 @@ function Step3Steps() {
 function Step4Image() {
   return (
     <div className={styles.stepTitle}>
-      <h3 className="text-xl" style={{ fontWeight: 600, color: 'var(--brand-brown)' }}>
+      <h3 className="text-xl" style={{ fontWeight: 600, color: "var(--brand-brown)" }}>
         🖼️ 4단계: 요리 이미지 업로드
       </h3>
-      <p className="text-m" style={{ color: 'var(--brand-gray)', marginTop: '8px' }}>
+      <p className="text-m" style={{ color: "var(--brand-gray)", marginTop: "8px" }}>
         완성 요리 대표 이미지 및 과정 사진을 업로드합니다.
       </p>
     </div>
@@ -478,10 +493,10 @@ function Step4Image() {
 function Step5Visibility() {
   return (
     <div className={styles.stepTitle}>
-      <h3 className="text-xl" style={{ fontWeight: 600, color: 'var(--brand-brown)' }}>
+      <h3 className="text-xl" style={{ fontWeight: 600, color: "var(--brand-brown)" }}>
         🔒 5단계: 공개 범위 및 옵션 설정
       </h3>
-      <p className="text-m" style={{ color: 'var(--brand-gray)', marginTop: '8px' }}>
+      <p className="text-m" style={{ color: "var(--brand-gray)", marginTop: "8px" }}>
         공개 여부, 댓글 허용 등의 옵션을 설정하세요.
       </p>
     </div>
@@ -491,10 +506,10 @@ function Step5Visibility() {
 function Step6Preview() {
   return (
     <div className={styles.stepTitle}>
-      <h3 className="text-xl" style={{ fontWeight: 600, color: 'var(--brand-brown)' }}>
+      <h3 className="text-xl" style={{ fontWeight: 600, color: "var(--brand-brown)" }}>
         👁️ 6단계: 등록 전 최종 미리보기
       </h3>
-      <p className="text-m" style={{ color: 'var(--brand-gray)', marginTop: '8px' }}>
+      <p className="text-m" style={{ color: "var(--brand-gray)", marginTop: "8px" }}>
         작성된 전체 레시피 카드를 미리 확인하고 최종 등록합니다.
       </p>
     </div>
@@ -507,18 +522,18 @@ function Step6Preview() {
 export default function RegistRecipe() {
   // URL 쿼리 스트링으로 현재 step 상태 유지 (?step=1)
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentStep = parseInt(searchParams.get('step') || '1', 10);
+  const currentStep = parseInt(searchParams.get("step") || "1", 10);
 
   // 통합 폼 상태 데이터
   const [formData, setFormData] = useState({
-    title: '매콤 크림 닭갈비 파스타',
+    title: "매콤 크림 닭갈비 파스타",
     description:
       "매콤한 닭갈비 소스와 고소한 크림이 만나 어우러진, 이색적인 퓨전 파스타 요리입니다. 부드럽고 매콤한 맛으로 남녀노소 모두가 조리 시간 약 20분, 난이도는 '하' 수준으로 간편합니다.",
-    category: '퓨전',
-    cookingTime: '20',
-    difficulty: '하',
-    servings: '2',
-    tags: ['#매콤크림파스타', '#퓨전파스타', '#닭갈비파스타', '#20분요리', '#초간단'],
+    category: "퓨전",
+    cookingTime: "20",
+    difficulty: "하",
+    servings: "2",
+    tags: ["#매콤크림파스타", "#퓨전파스타", "#닭갈비파스타", "#20분요리", "#초간단"],
     ingredients: [],
     cookingSteps: [],
     images: [],
@@ -527,23 +542,23 @@ export default function RegistRecipe() {
 
   // 상태 업데이트 헬퍼 함수
   const updateFormData = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   // 단계 이동 (URL SearchParam 업데이트로 뒤로가기 내비게이션 대응)
-  const goToStep = (stepNumber) => {
+  const goToStep = stepNumber => {
     if (stepNumber >= 1 && stepNumber <= 6) {
       setSearchParams({ step: stepNumber });
     }
   };
 
   const steps = [
-    { id: 1, label: '기본 정보' },
-    { id: 2, label: '재료' },
-    { id: 3, label: '조리 과정' },
-    { id: 4, label: '이미지' },
-    { id: 5, label: '공개 설정' },
-    { id: 6, label: '미리 보기' },
+    { id: 1, label: "기본 정보" },
+    { id: 2, label: "재료" },
+    { id: 3, label: "조리 과정" },
+    { id: 4, label: "이미지" },
+    { id: 5, label: "공개 설정" },
+    { id: 6, label: "미리 보기" },
   ];
 
   // 현재 단계별 서브 컴포넌트 렌더링 맵
@@ -568,26 +583,26 @@ export default function RegistRecipe() {
 
   return (
     <Layout activeMenu="AI 레시피">
-      <div className="container" style={{ paddingTop: '20px', paddingBottom: '60px' }}>
+      <div className="container" style={{ paddingTop: "20px", paddingBottom: "60px" }}>
         {/* 상단 타이틀 영역 */}
         <div className={styles.headerArea}>
-          <h1 className="font-display dtext-4xl" style={{ marginBottom: '12px' }}>
+          <h1 className="font-display dtext-4xl" style={{ marginBottom: "12px" }}>
             레시피 등록하기
           </h1>
-          <p className="text-lg" style={{ color: 'var(--brand-gray)' }}>
+          <p className="text-lg" style={{ color: "var(--brand-gray)" }}>
             단계별로 입력하면 완성! AI 도우미가 작성을 도와드려요.
           </p>
         </div>
 
         {/* 6단계 알약 인디케이터 바 */}
         <div className={styles.stepNav}>
-          {steps.map((step) => {
+          {steps.map(step => {
             const isActive = currentStep === step.id;
             return (
               <button
                 key={step.id}
                 type="button"
-                className={`${styles.stepPill} ${isActive ? styles.activeStepPill : ''}`}
+                className={`${styles.stepPill} ${isActive ? styles.activeStepPill : ""}`}
                 onClick={() => goToStep(step.id)}
               >
                 <span className={styles.stepNumber}>{step.id}</span>
@@ -614,7 +629,7 @@ export default function RegistRecipe() {
           <div className={styles.rightActions}>
             <button
               type="button"
-              className={`${styles.navBtn} ${currentStep === 1 ? styles.disabledBtn : ''}`}
+              className={`${styles.navBtn} ${currentStep === 1 ? styles.disabledBtn : ""}`}
               onClick={() => goToStep(currentStep - 1)}
               disabled={currentStep === 1}
             >
@@ -625,13 +640,13 @@ export default function RegistRecipe() {
               className={styles.nextBtn}
               onClick={() => {
                 if (currentStep === 6) {
-                  alert('레시피가 성공적으로 등록되었습니다!');
+                  alert("레시피가 성공적으로 등록되었습니다!");
                 } else {
                   goToStep(currentStep + 1);
                 }
               }}
             >
-              {currentStep === 6 ? '완성하기' : '다음 ›'}
+              {currentStep === 6 ? "완성하기" : "다음 ›"}
             </button>
           </div>
         </div>
