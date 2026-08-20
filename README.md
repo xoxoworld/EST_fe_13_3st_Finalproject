@@ -4,6 +4,8 @@
 
 🔗 **배포 사이트 : [깃깔나는 레시피](https://est-fe-13-3st-finalproject.vercel.app/)**
 
+🔗 **발표 자료 : [Figma Slides](https://www.figma.com/deck/oWOYL2FSTLR8VeDpPIxCfm/%EB%B0%9C%ED%91%9C%EC%9E%90%EB%A3%8C?node-id=9-9691&t=cAuiaPQiz8vmvn4l-1)**
+
 ---
 
 ## 1. 프로젝트 소개
@@ -36,6 +38,35 @@ Supabase를 활용하여 사용자 인증, 데이터베이스, 이미지 저장�
 | 전체 프로젝트 기간 | **2026.07.15 ~ 2026.08.21** |
 | 주요 구현 기간     | **2026.07.28 ~ 2026.08.21** |
 | 프로젝트 유형      | **4인 팀 프로젝트**         |
+
+```mermaid
+gantt
+    title 프로젝트 개발 일정
+    dateFormat  YYYY-MM-DD
+    axisFormat  %m/%d
+
+    section 기획 및 조사
+    사이트 분석               :plan1, 2026-07-17, 2d
+    레퍼런스 조사             :plan2, 2026-07-18, 4d
+
+    section FIGMA (디자인/기획)
+    스토리보드 제작           :des1, 2026-07-22, 3d
+    스타일가이드 정립         :des2, 2026-07-25, 2d
+    디자인 시안 제작         :des3, 2026-07-27, 2d
+
+    section 백엔드
+    API / 데이터 구조 분석   :back1, 2026-07-29, 3d
+    비동기 통신 / 데이터 렌더링 :back2, 2026-08-01, 7d
+    컴포넌트 설계 / 예외 처리  :back3, 2026-08-07, 7d
+
+    section 프론트엔드
+    반응형 설계               :front1, 2026-08-07, 2d
+    디자인 작업               :front2, 2026-08-09, 5d
+
+    section 마무리 및 발표
+    통합 테스트               :test, 2026-08-14, 5d
+    발표 자료 제작           :demo, 2026-08-19, 2d
+```
 
 ---
 
