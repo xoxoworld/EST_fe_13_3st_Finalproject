@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { supabase } from '../../lib/supabaseClient';
 import { Layout } from '../../components';
-import { Pencil, MessageCircle, Search, ChevronDown, Eye, Heart, X, Camera, Trash2, UtensilsCrossed, Users, UserPlus } from 'lucide-react';
+import { Pencil, MessageCircle, Search, ChevronDown, Eye, Heart, X, Camera, Trash2, UtensilsCrossed, Users, UserPlus, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useNotification } from '../../context/NotificationContext';
 import SEO from "../../components/SEO";
 import styles from './MyPage.module.css';
 
@@ -76,15 +77,18 @@ function MyRecipeCard({ recipe, onTogglePublic, isLikedCard, onEdit, onDelete })
 export default function MyPage() {
   const { user, authLoading } = useAuth();
   const navigate = useNavigate();
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     if (!authLoading && !user) {
-      alert("로그인이 필요한 페이지입니다.");
+      showNotification("로그인이 필요한 페이지입니다.", "error");
       navigate('/login', { state: { from: "/mypage" } });
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, showNotification]);
 
   const [activeTab, setActiveTab] = useState('내가 작성한 레시피');
+  const [deleteRecipeId, setDeleteRecipeId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState('최신순');
   const [isSortOpen, setIsSortOpen] = useState(false);
 
@@ -96,6 +100,7 @@ export default function MyPage() {
   const [avatarPreview, setAvatarPreview] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
   const fileInputRef = useRef(null);
+  const [profileResultModal, setProfileResultModal] = useState({ isOpen: false, isError: false, message: '' });
 
   // 디바운스
   const [searchTerm, setSearchTerm] = useState('');
@@ -179,10 +184,18 @@ export default function MyPage() {
 
       setProfileAvatarUrl(finalAvatarUrl);
       setIsEditModalOpen(false);
-      alert(`프로필이 저장되었습니다!\n닉네임: ${profileNickname}\n레시피 업데이트: ${recipesData?.length ?? 0}건\n댓글 업데이트: ${commentsData?.length ?? 0}건`);
+      setProfileResultModal({
+        isOpen: true,
+        isError: false,
+        message: `프로필이 저장되었습니다!\n닉네임: ${profileNickname}\n레시피 업데이트: ${recipesData?.length ?? 0}건\n댓글 업데이트: ${commentsData?.length ?? 0}건`
+      });
     } catch (err) {
       console.error('[프로필저장] 전체 오류:', err);
-      alert(`프로필 저장 중 오류가 발생했습니다.\n오류: ${err.message}`);
+      setProfileResultModal({
+        isOpen: true,
+        isError: true,
+        message: `프로필 저장 중 오류가 발생했습니다.\n오류: ${err.message}`
+      });
     } finally {
       setProfileSaving(false);
     }
@@ -448,37 +461,44 @@ export default function MyPage() {
     });
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm("정말로 이 레시피를 삭제하시겠습니까?")) {
-      try {
-        // 1. DB의 ON DELETE CASCADE 설정이 안 되어 있을 수 있으므로 연관 데이터 먼저 삭제 시도
-        await Promise.all([
-          supabase.from('recipe_likes').delete().eq('recipe_id', id),
-          supabase.from('recipe_bookmarks').delete().eq('recipe_id', id),
-          supabase.from('recipe_comments').delete().eq('recipe_id', id)
-        ]);
+  const handleDelete = (id) => {
+    setDeleteRecipeId(id);
+    setIsDeleteModalOpen(true);
+  };
 
-        // 2. 레시피 테이블에서 삭제
-        const { error, status } = await supabase.from('recipes').delete().eq('id', id);
-        
-        if (error) {
-          console.error('[레시피 삭제 실패] Supabase Error:', error, 'Status:', status);
-          throw Object.assign(new Error(error.message), { code: error.code, status });
-        }
+  const confirmDelete = async () => {
+    if (!deleteRecipeId) return;
+    try {
+      // 1. DB의 ON DELETE CASCADE 설정이 안 되어 있을 수 있으므로 연관 데이터 먼저 삭제 시도
+      await Promise.all([
+        supabase.from('recipe_likes').delete().eq('recipe_id', deleteRecipeId),
+        supabase.from('recipe_bookmarks').delete().eq('recipe_id', deleteRecipeId),
+        supabase.from('recipe_comments').delete().eq('recipe_id', deleteRecipeId)
+      ]);
 
-        setRecipeData(prev => prev.filter(r => r.id !== id));
-        alert("레시피가 삭제되었습니다.");
-      } catch (err) {
-        console.error('[레시피 삭제 예외 발생]:', err);
-        
-        if (err.status === 401 || err.code === '401') {
-          alert("권한이 없거나 세션이 만료되었습니다. 다시 로그인한 후 시도해주세요.");
-        } else if (err.code === '23503') {
-          alert("이 레시피와 연결된 데이터(다른 사용자의 댓글/좋아요 등)가 남아있어 삭제할 수 없습니다.\nDB의 CASCADE 설정을 확인해주세요.");
-        } else {
-          alert(`삭제 중 오류가 발생했습니다.\n상세 내용: ${err.message || '알 수 없는 오류'}`);
-        }
+      // 2. 레시피 테이블에서 삭제
+      const { error, status } = await supabase.from('recipes').delete().eq('id', deleteRecipeId);
+      
+      if (error) {
+        console.error('[레시피 삭제 실패] Supabase Error:', error, 'Status:', status);
+        throw Object.assign(new Error(error.message), { code: error.code, status });
       }
+
+      setRecipeData(prev => prev.filter(r => r.id !== deleteRecipeId));
+      showNotification("레시피가 삭제되었습니다.", "success");
+    } catch (err) {
+      console.error('[레시피 삭제 예외 발생]:', err);
+      
+      if (err.status === 401 || err.code === '401') {
+        showNotification("권한이 없거나 세션이 만료되었습니다. 다시 로그인한 후 시도해주세요.", "error");
+      } else if (err.code === '23503') {
+        showNotification("이 레시피와 연결된 데이터가 남아있어 삭제할 수 없습니다.", "error");
+      } else {
+        showNotification(`삭제 중 오류가 발생했습니다. 상세 내용: ${err.message || '알 수 없는 오류'}`, "error");
+      }
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDeleteRecipeId(null);
     }
   };
 
@@ -881,6 +901,108 @@ export default function MyPage() {
                 }}
               >
                 {profileSaving ? '저장 중...' : '저장'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 레시피 삭제 모달 */}
+      {isDeleteModalOpen && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '24px',
+            padding: '40px',
+            width: '100%',
+            maxWidth: '400px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+            textAlign: 'center'
+          }}>
+            <div style={{ marginBottom: '24px', color: 'var(--brand-primary)', display: 'flex', justifyContent: 'center' }}>
+              <Trash2 size={48} />
+            </div>
+            <h2 style={{ color: 'var(--brand-brown)', marginBottom: '16px', fontSize: '20px', fontWeight: 700 }}>
+              레시피 삭제
+            </h2>
+            <p style={{ color: 'var(--brand-gray)', marginBottom: '32px', fontSize: '15px', lineHeight: '1.5' }}>
+              정말로 이 레시피를 삭제하시겠습니까?<br />삭제된 데이터는 복구할 수 없습니다.
+            </p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  setIsDeleteModalOpen(false);
+                  setDeleteRecipeId(null);
+                }}
+                style={{
+                  flex: 1, padding: '14px',
+                  border: '1px solid var(--brand-divider, #e0e0e0)',
+                  borderRadius: '12px', background: 'none',
+                  color: 'var(--brand-gray)', cursor: 'pointer', fontSize: '15px'
+                }}
+              >
+                취소
+              </button>
+              <button
+                onClick={confirmDelete}
+                style={{
+                  flex: 1, padding: '14px',
+                  backgroundColor: 'var(--brand-primary)',
+                  color: '#fff', border: 'none',
+                  borderRadius: '12px', cursor: 'pointer',
+                  fontSize: '15px', fontWeight: 600
+                }}
+              >
+                삭제하기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 프로필 저장 결과 모달 */}
+      {profileResultModal.isOpen && (
+        <div style={{
+          position: 'fixed', inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '24px',
+            padding: '40px',
+            width: '100%',
+            maxWidth: '400px',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+            textAlign: 'center'
+          }}>
+            <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'center', color: profileResultModal.isError ? 'var(--brand-primary)' : '#4CAF50' }}>
+              {profileResultModal.isError ? <AlertCircle size={48} /> : <CheckCircle size={48} />}
+            </div>
+            <h2 style={{ color: 'var(--brand-brown)', marginBottom: '16px', fontSize: '20px', fontWeight: 700 }}>
+              {profileResultModal.isError ? '프로필 저장 실패' : '프로필 저장 완료'}
+            </h2>
+            <p style={{ color: 'var(--brand-gray)', marginBottom: '32px', fontSize: '15px', lineHeight: '1.5', whiteSpace: 'pre-line' }}>
+              {profileResultModal.message}
+            </p>
+            <div style={{ display: 'flex' }}>
+              <button
+                onClick={() => setProfileResultModal({ isOpen: false, isError: false, message: '' })}
+                style={{
+                  width: '100%', padding: '14px',
+                  backgroundColor: 'var(--brand-primary)',
+                  color: '#fff', border: 'none',
+                  borderRadius: '12px', cursor: 'pointer',
+                  fontSize: '15px', fontWeight: 600
+                }}
+              >
+                확인
               </button>
             </div>
           </div>
